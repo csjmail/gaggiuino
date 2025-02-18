@@ -28,6 +28,8 @@ struct SensorState {
   long pumpClicks;
   uint16_t waterLvl;
   bool tofReady;
+  uint16_t trayLvl;
+  bool tofDTReady;
 };
 
 struct SensorStateSnapshot {
@@ -40,6 +42,7 @@ struct SensorStateSnapshot {
   float weightFlow;
   float weight;
   uint16_t waterLvl;
+  uint16_t trayLvl;
 };
 
 #endif

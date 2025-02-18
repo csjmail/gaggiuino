@@ -552,6 +552,15 @@ void lcdShowPopup(const char *msg) {
 void lcdSetTankWaterLvl(uint16_t val) {
   myNex.writeNum("j0.val", val);
 }
+void lcdSetDripTrayLvl(uint16_t val) {
+  myNex.writeNum("j1.val", val);
+  // if(val>80){
+  //   myNex.writeNum("j1.pco", red);
+  // }else{
+  //   myNex.writeNum("j1.pco", blue);
+  // }
+
+}
 void lcdTargetState(int val) {
   myNex.writeNum("targetState", val);
 }

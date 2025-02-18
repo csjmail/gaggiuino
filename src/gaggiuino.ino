@@ -25,16 +25,29 @@ eepromValues_t runningCfg;
 SystemState systemState;
 
 LED led;
-TOF tof;
+
+#ifdef TOF_VL53L0X
+TOF tof_wt;//Water tank level sensor
+#endif
+#ifdef TOF_DRIPTRAY
+TOF tof_dt;//Drip tray level sensor
+#endif
 
 void setup(void) {
   LOG_INIT();
+
   LOG_INFO("Gaggiuino (fw: %s) booting", AUTO_VERSION);
+  
+  // for(int n = 1; n < 20; n++ )
+  // {
+  //   LOG_INFO("DELAY");
+  //   delay(200);
+  // }
 
   // Various pins operation mode handling
   pinInit();
   LOG_INFO("Pin init");
-
+  
   setBoilerOff();  // relayPin LOW
   setSteamValveRelayOff();
   setSteamBoilerRelayOff();
@@ -63,8 +76,24 @@ void setup(void) {
   // Initialize LED
   led.begin();
   led.setColor(9u, 0u, 9u); // WHITE
+  
   // Init the tof sensor
-  tof.init(currentState);
+  #ifdef TOF_VL53L0X
+  //tof_wt.init(currentState);
+  tof_wt.init(currentState,0x2B);//0x2A 0x2B
+  #endif
+   #ifdef TOF_DRIPTRAY
+  tof_dt.init(currentState,0x29);//Set address of 2nd sensor.
+  #endif
+  LOG_INFO("TOF Init");
+ 
+  // for(int n = 1; n < 100; n++ )
+  // {
+  //   LOG_INFO("VL %d",tof_wt.readLvl());
+  //   delay(10);
+  //   LOG_INFO("DL %d",tof_dt.readLvl());
+  //   delay(1000);
+  // }
 
   // Initialising the saved values or writing defaults if first start
   eepromInit();
@@ -96,7 +125,7 @@ void setup(void) {
 
   // Change LED colour on setup exit.
   led.setColor(9u, 0u, 9u); // 64171
-
+  
   iwdcInit();
 }
 
@@ -116,6 +145,7 @@ void loop(void) {
   lcdRefresh();
   espCommsSendSensorData(currentState);
   sysHealthCheck(SYS_PRESSURE_IDLE);
+  //led.setColor(0u, 0u, 9u); // 64171
 }
 
 //##############################################################################################################################
@@ -132,6 +162,7 @@ static void sensorsRead(void) {
   calculateWeightAndFlow();
   updateStartupTimer();
   readTankWaterLevel();
+  readDripTrayLevel();
   doLed();
 }
 
@@ -246,9 +277,29 @@ static void readTankWaterLevel(void) {
   if (lcdCurrentPageId == NextionPage::Home) {
     // static uint32_t tof_timeout = millis();
     // if (millis() >= tof_timeout) {
-    currentState.waterLvl = tof.readLvl();
+    #ifdef TOF_VL53L0X
+    if(tof_wt.readLvl(&currentState.waterLvl)){
+      //LOG_INFO("WT PCT: %d",currentState.waterLvl);
+    }
+    #else
+    currentState.waterLvl =50;
+    #endif
       // tof_timeout = millis() + 500;
     // }
+  }
+}
+
+// return the reading in mm of the tank water level.
+static void readDripTrayLevel(void) {
+  if (lcdCurrentPageId == NextionPage::Home) {
+    #ifdef TOF_DRIPTRAY
+    if(tof_dt.readLvl(&currentState.trayLvl)){
+      //LOG_INFO("DT PCT: %d",currentState.trayLvl);
+    }
+    #else
+    currentState.trayLvl =50;
+    #endif
+
   }
 }
 
@@ -365,6 +416,9 @@ static void lcdRefresh(void) {
         lcdSetTemperatureDecimal(tempDecimal);
         // water lvl
         lcdSetTankWaterLvl(currentState.waterLvl);
+        // drip tray lvl
+        lcdSetDripTrayLvl(currentState.trayLvl);
+        
         //weight
         if (homeScreenScalesEnabled) lcdSetWeight(currentState.weight);
         break;

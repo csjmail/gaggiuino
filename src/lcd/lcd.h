@@ -58,6 +58,7 @@ void lcdSetWeight(float val);
 void lcdSetFlow(int val);
 void lcdSetUpTime(float val);
 void lcdSetTankWaterLvl(uint16_t val);
+void lcdSetDripTrayLvl(uint16_t val);
 
 void lcdShowDebug(int val1, int val2);
 void lcdShowPopup(const char *msg);

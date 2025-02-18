@@ -19,6 +19,7 @@
 #else
 #define waterPin      PA12
 #endif
+#define tofShutdownPin PB5
 
 #ifdef PCBV2
 // PCB V2
@@ -26,10 +27,12 @@
 #define steamBoilerRelayPin PB13
 #endif
 
+//load cells
 #define HX711_sck_1   PB0
 #define HX711_dout_1  PB8
 #define HX711_dout_2  PB9
 
+//LCD
 #define USART_LCD     Serial2 // PA2(TX) & PA3(RX)
 #define USART_ESP     Serial1 // PA9(TX) & PA10(RX)
 #define USART_DEBUG   Serial  // USB-CDC (Takes PA8,PA9,PA10,PA11)

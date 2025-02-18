@@ -26,7 +26,7 @@ function Home() {
   const [scalesPresent, setScalesPresent] = useState(false);
 
   const [lastSensorData, setLastSensorData] = useState({
-    temperature: 0, pressure: 0, pumpFlow: 0, weight: 0, scalesPresent: false, waterLvl: 0,
+    temperature: 0, pressure: 0, pumpFlow: 0, weight: 0, scalesPresent: false, waterLvl: 0, trayLvl: 0,
   });
 
   useEffect(() => {
@@ -77,6 +77,7 @@ function Home() {
         <Grid item xs={2}>
           <Box sx={{ border: `0px solid ${theme.palette.divider}`, position: 'relative', borderRadius: '16px', width: '100%', padding: '0px', gap: '0px' }}>
             {boxedComponent(<GaugeLiquid value={lastSensorData.waterLvl} radius={boxSize.width}/>)}
+            {/* {boxedComponent(<GaugeLiquid value={lastSensorData.trayLvl} radius={boxSize.width}/>)} */}
             {boxedComponent(<GaugeChart value={lastSensorData.pressure} maintainAspectRatio={false}  primaryColor={theme.palette.pressure.main} title="Pressure" unit="bar" maxValue={14} />)}
             {boxedComponent(<GaugeChart value={lastSensorData.weight} maintainAspectRatio={false} primaryColor={theme.palette.weight.main} title="Weight" unit="gr" maxValue={100} />)}
           </Box>
